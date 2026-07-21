@@ -4,9 +4,9 @@ import VireoDemo from './demos/VireoDemo'
 import './App.css'
 
 const LINKS = [
-  { label: 'GitHub', href: 'https://github.com/xmuramasa' },
-  { label: 'LinkedIn', href: 'https://www.linkedin.com/in/xmuramasa' },
-  { label: 'Email', href: 'mailto:martin.salinas.scussolin@gmail.com' },
+  { label: ' GitHub', href: 'https://github.com/xmuramasa' },
+  { label: ' LinkedIn', href: 'https://www.linkedin.com/in/xmuramasa' },
+  { label: ' Email', href: 'mailto:martin.salinas.scussolin@gmail.com' },
 ]
 
 const STACK = [

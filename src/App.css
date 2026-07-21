@@ -1,23 +1,44 @@
-/* tokyonight-ish palette to match the GitHub profile theme */
+/* CaskaydiaCove Nerd Font (Cascadia Code + nerd glyphs), SIL OFL — license in assets/fonts */
+@font-face {
+  font-family: 'CaskaydiaCove NF';
+  src: url('./assets/fonts/CaskaydiaCoveNF-Regular.woff2') format('woff2');
+  font-weight: 400;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'CaskaydiaCove NF';
+  src: url('./assets/fonts/CaskaydiaCoveNF-Bold.woff2') format('woff2');
+  font-weight: 600 700;
+  font-display: swap;
+}
+
+/* billelis-inspired: near-black, ornate gold, metallic type (original CSS/SVG, not his art) */
 :root {
-  --bg: #1a1b26;
-  --panel: #24283b;
-  --panel-2: #2f3450;
-  --text: #c0caf5;
-  --muted: #787fa8;
-  --accent: #7aa2f7;
+  --bg: #0c0b0e;
+  --panel: #151318;
+  --panel-2: #1e1b23;
+  --text: #d8d2c4;
+  --muted: #8a8377;
+  --accent: #c9a227;
+  --gold-hi: #f0dc9b;
+  --gold-lo: #8a6d1f;
   --green: #9ece6a;
-  --border: #3b4261;
+  --border: #2c2833;
 }
 
 * { box-sizing: border-box; }
 
 body {
   margin: 0;
-  background: var(--bg);
   color: var(--text);
-  font-family: system-ui, -apple-system, sans-serif;
+  font-family: 'CaskaydiaCove NF', ui-monospace, monospace;
   line-height: 1.6;
+  background:
+    radial-gradient(ellipse 80% 50% at 50% -10%, rgba(201, 162, 39, 0.10), transparent 70%),
+    radial-gradient(ellipse 120% 90% at 50% 110%, rgba(0, 0, 0, 0.8), transparent 60%),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160' viewBox='0 0 160 160'%3E%3Cg fill='none' stroke='%23c9a227' stroke-opacity='.06' stroke-width='1.5'%3E%3Cpath d='M80 20c15 20 40 25 60 20-5 20 0 45-20 60 20 15 15 40 20 60-20-5-45 0-60 20-15-20-40-25-60-20 5-20 0-45 20-60C20 85 25 60 20 40c20 5 45 0 60-20z'/%3E%3Ccircle cx='80' cy='80' r='28'/%3E%3Cpath d='M80 52v56M52 80h56'/%3E%3C/g%3E%3C/svg%3E"),
+    var(--bg);
+  background-attachment: fixed;
 }
 
 #root {
@@ -29,7 +50,15 @@ body {
 a { color: var(--accent); }
 
 /* hero */
-.hero h1 { margin: 0; font-size: 2.2rem; letter-spacing: -0.02em; }
+.hero h1 {
+  margin: 0;
+  font-size: 2.4rem;
+  letter-spacing: 0.02em;
+  background: linear-gradient(180deg, var(--gold-hi), var(--accent) 45%, var(--gold-lo) 58%, #e0c368);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
 .role { color: var(--accent); font-weight: 600; margin: 0.25rem 0 1rem; }
 .tagline { color: var(--muted); max-width: 60ch; margin: 0 0 1.25rem; }
 .links { display: flex; gap: 1.25rem; }
@@ -49,12 +78,18 @@ a { color: var(--accent); }
 
 /* projects */
 .project {
-  background: var(--panel);
+  background: color-mix(in srgb, var(--panel) 88%, transparent);
   border: 1px solid var(--border);
   border-radius: 12px;
   padding: 1.5rem;
   margin: 2rem 0;
+  transition: border-color 0.3s, box-shadow 0.3s;
 }
+.project:hover {
+  border-color: color-mix(in srgb, var(--accent) 55%, var(--border));
+  box-shadow: 0 0 24px rgba(201, 162, 39, 0.08);
+}
+.project h2 { letter-spacing: 0.02em; }
 .project-head { display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
 .project h2 { margin: 0; font-size: 1.4rem; }
 .tech { color: var(--accent); font-size: 0.85rem; margin: 0.25rem 0 0.75rem; }
@@ -112,7 +147,7 @@ a { color: var(--accent); }
   border: 1px solid var(--border);
   border-radius: 8px;
   padding: 0.75rem;
-  font-family: ui-monospace, monospace;
+  font-family: inherit;
   font-size: 0.8rem;
   resize: vertical;
   min-height: 260px;
