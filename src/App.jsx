@@ -1,3 +1,5 @@
+import { useEffect, useState } from 'react'
+import Experience, { Education } from './Experience'
 import ImgDemo from './demos/ImgDemo'
 import ResumeDemo from './demos/ResumeDemo'
 import VireoDemo from './demos/VireoDemo'
@@ -46,6 +48,16 @@ const PROJECTS = [
 ]
 
 export default function App() {
+  const [tab, setTab] = useState('projects')
+  useEffect(() => {
+    const onMove = (e) => {
+      const s = document.documentElement.style
+      s.setProperty('--mx', e.clientX / innerWidth - 0.5)
+      s.setProperty('--my', e.clientY / innerHeight - 0.5)
+    }
+    window.addEventListener('pointermove', onMove, { passive: true })
+    return () => window.removeEventListener('pointermove', onMove)
+  }, [])
   return (
     <>
       <header className="hero">
@@ -67,9 +79,20 @@ export default function App() {
         {STACK.map((t) => <span key={t} className="chip">{t}</span>)}
       </section>
 
+      <nav className="tabs">
+        {['projects', 'experience', 'education'].map((t) => (
+          <button key={t} className={tab === t ? 'active' : ''} onClick={() => setTab(t)}>
+            {t}
+          </button>
+        ))}
+      </nav>
+
       <main>
-        {PROJECTS.map(({ name, repo, tech, blurb, demoNote, Demo }) => (
-          <section key={name} className="project">
+        {tab === 'experience' && <Experience />}
+        {tab === 'education' && <Education />}
+        {tab === 'projects' && PROJECTS.map(({ name, repo, tech, blurb, demoNote, Demo }, i) => (
+          <div key={name} className="card-shadow">
+          <section className="project" data-index={`SYS_0${i + 1}`}>
             <div className="project-head">
               <h2>{name}</h2>
               <a className="btn" href={repo} target="_blank" rel="noreferrer">Source ↗</a>
@@ -79,6 +102,7 @@ export default function App() {
             <p className="demo-note">{demoNote}</p>
             <Demo />
           </section>
+          </div>
         ))}
       </main>
 
