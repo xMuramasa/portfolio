@@ -1,0 +1,9 @@
+{
+  "$schema": "https://raw.githubusercontent.com/cloudflare/workers-sdk/main/packages/wrangler/config-schema.json",
+  "name": "portfolio",
+  "compatibility_date": "2026-07-21",
+  // assets-only worker: no script, just serve the vite build
+  "assets": {
+    "directory": "./dist"
+  }
+}
