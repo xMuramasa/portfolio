@@ -62,9 +62,9 @@ export default function App() {
     <>
       <header className="hero">
         <h1>Martín Salinas Scussolin</h1>
-        <p className="role">Systems &amp; Cloud Engineer</p>
+        <p className="role">Software &amp; Cloud Engineer</p>
         <p className="tagline">
-          I build scalable backend systems, cloud infrastructure, and automation —
+          I build scalable frontend and backend systems, cloud infrastructure, and automation —
           from Expo/React clients through NestJS services to Terraform-managed AWS,
           with a focus on reliability, security, and maintainability.
         </p>
