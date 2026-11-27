@@ -1,113 +1,152 @@
 import { useEffect, useState } from 'react'
 import Experience, { Education } from './Experience'
+import { CONTENT, LANGS, REPOS, STACK, links } from './content'
+import TrismegistusDemo from './demos/TrismegistusDemo'
+import CaduceusDemo from './demos/CaduceusDemo'
+import NewsDemo from './demos/NewsDemo'
 import ImgDemo from './demos/ImgDemo'
 import ResumeDemo from './demos/ResumeDemo'
 import VireoDemo from './demos/VireoDemo'
 import './App.css'
 
-const LINKS = [
-  { label: ' GitHub', href: 'https://github.com/xmuramasa' },
-  { label: ' LinkedIn', href: 'https://www.linkedin.com/in/xmuramasa' },
-  { label: ' Email', href: 'mailto:martin.salinas.scussolin@gmail.com' },
-]
+const DEMOS = {
+  trismegistus: TrismegistusDemo,
+  caduceus: CaduceusDemo,
+  news: NewsDemo,
+  img: ImgDemo,
+  resume: ResumeDemo,
+  vireo: VireoDemo,
+}
+const TABS = ['projects', 'experience', 'education']
 
-const STACK = [
-  'AWS', 'Terraform', 'Docker', 'GitHub Actions',
-  'TypeScript', 'NestJS', 'React', 'Expo', 'Go', 'Python',
-  'PostgreSQL', 'DynamoDB', 'Clerk', 'Cognito',
-]
+// ?lang= wins (shareable links, screenshots), then the last choice, then the browser's language.
+function initialLang() {
+  const q = new URLSearchParams(location.search).get('lang')
+  if (LANGS.includes(q)) return q
+  const saved = localStorage.getItem('lang')
+  if (LANGS.includes(saved)) return saved
+  return navigator.language?.toLowerCase().startsWith('es') ? 'es' : 'en'
+}
 
-const PROJECTS = [
-  {
-    name: 'img-transformer',
-    repo: 'https://github.com/xMuramasa/img-transformer',
-    tech: ['Python', 'FastAPI', 'Pillow', 'Docker'],
-    blurb:
-      'A FastAPI service that converts and resizes images — single files, batches, or whole zip archives — plus batch PDF optimization. Started life as a Jupyter notebook, now a production-shaped app with a pure-Python core and a drag-and-drop UI.',
-    demoNote: 'Live demo — runs the same conversion in your browser:',
-    Demo: ImgDemo,
-  },
-  {
-    name: 'resume-generator',
-    repo: 'https://github.com/xMuramasa/resume',
-    tech: ['Python (stdlib only)', 'Headless Chrome'],
-    blurb:
-      'Markdown resume → PDF via headless Chrome. Zero dependencies, no venv: a tiny markdown renderer, an HTML template, and Chrome doing the printing. My actual CVs are built with it.',
-    demoNote: 'Live demo — edit the markdown, watch the resume render:',
-    Demo: ResumeDemo,
-  },
-  {
-    name: 'vireo',
-    repo: 'https://github.com/xMuramasa/hls_service_test',
-    tech: ['Bun', 'Hono', 'React', 'Postgres', 'Clerk', 'ffmpeg', 'HLS'],
-    blurb:
-      'An HLS streaming service: upload a video, watch it transcode in place, then play it back in a draggable window that adopts each video’s aspect ratio. Bun + Hono API with Clerk auth and Postgres; Vite + React frontend with hls.js.',
-    demoNote: 'The player window is draggable — just like the real one:',
-    Demo: VireoDemo,
-  },
-]
+const tabFromHash = () => (TABS.includes(location.hash.slice(1)) ? location.hash.slice(1) : 'projects')
 
 export default function App() {
-  const [tab, setTab] = useState('projects')
+  const [lang, setLang] = useState(initialLang)
+  const [tab, setTab] = useState(tabFromHash)
+  const t = CONTENT[lang]
+
   useEffect(() => {
     const onMove = (e) => {
       const s = document.documentElement.style
       s.setProperty('--mx', e.clientX / innerWidth - 0.5)
       s.setProperty('--my', e.clientY / innerHeight - 0.5)
     }
+    const onHash = () => setTab(tabFromHash())
     window.addEventListener('pointermove', onMove, { passive: true })
-    return () => window.removeEventListener('pointermove', onMove)
+    window.addEventListener('hashchange', onHash)
+    return () => {
+      window.removeEventListener('pointermove', onMove)
+      window.removeEventListener('hashchange', onHash)
+    }
   }, [])
+
+  useEffect(() => {
+    document.documentElement.lang = lang
+    document.title = t.meta.title
+    document.querySelector('meta[name="description"]')?.setAttribute('content', t.meta.description)
+  }, [lang, t])
+
+  function chooseLang(l) {
+    setLang(l)
+    localStorage.setItem('lang', l)
+    const url = new URL(location.href)
+    url.searchParams.delete('lang')
+    history.replaceState(null, '', url)
+  }
+
+  function chooseTab(name) {
+    setTab(name)
+    history.replaceState(null, '', `${location.pathname}${location.search}#${name}`)
+  }
+
   return (
     <>
       <header className="hero">
-        <h1>Martín Salinas Scussolin</h1>
-        <p className="role">Software &amp; Cloud Engineer</p>
-        <p className="tagline">
-          I build scalable frontend and backend systems, cloud infrastructure, and automation —
-          from Expo/React clients through NestJS services to Terraform-managed AWS,
-          with a focus on reliability, security, and maintainability.
-        </p>
+        <div className="hero-top">
+          <h1>Martín Salinas Scussolin</h1>
+          <div className="lang-toggle" role="group" aria-label={t.langLabel}>
+            {LANGS.map((l) => (
+              <button key={l} className={l === lang ? 'active' : ''} aria-pressed={l === lang} onClick={() => chooseLang(l)}>
+                {l}
+              </button>
+            ))}
+          </div>
+        </div>
+        <p className="role">{t.role}</p>
+        <p className="where">{t.where}</p>
+        <p className="tagline">{t.tagline}</p>
         <nav className="links">
-          {LINKS.map((l) => (
-            <a key={l.label} href={l.href} target="_blank" rel="noreferrer">{l.label}</a>
+          {links(lang).map((l) => (
+            <a key={l.href} href={l.href} target="_blank" rel="noreferrer">{l.label}</a>
           ))}
         </nav>
       </header>
 
       <section className="stack">
-        {STACK.map((t) => <span key={t} className="chip">{t}</span>)}
+        {STACK.map((s) => <span key={s} className="chip">{s}</span>)}
+      </section>
+
+      <section className="how" aria-labelledby="how-title">
+        <h2 id="how-title">{t.how.title}</h2>
+        <div className="how-grid">
+          {t.how.items.map((item, i) => (
+            <div key={item.title} className="how-item">
+              <span className="how-index">0{i + 1}</span>
+              <h3>{item.title}</h3>
+              <p>{item.text}</p>
+            </div>
+          ))}
+        </div>
       </section>
 
       <nav className="tabs">
-        {['projects', 'experience', 'education'].map((t) => (
-          <button key={t} className={tab === t ? 'active' : ''} onClick={() => setTab(t)}>
-            {t}
+        {TABS.map((name) => (
+          <button key={name} className={tab === name ? 'active' : ''} onClick={() => chooseTab(name)}>
+            {t.tabs[name]}
           </button>
         ))}
       </nav>
 
       <main>
-        {tab === 'experience' && <Experience />}
-        {tab === 'education' && <Education />}
-        {tab === 'projects' && PROJECTS.map(({ name, repo, tech, blurb, demoNote, Demo }, i) => (
-          <div key={name} className="card-shadow">
-          <section className="project" data-index={`SYS_0${i + 1}`}>
-            <div className="project-head">
-              <h2>{name}</h2>
-              <a className="btn" href={repo} target="_blank" rel="noreferrer">Source ↗</a>
+        {tab === 'experience' && <Experience entries={t.jobs} />}
+        {tab === 'education' && <Education entries={t.education} />}
+        {tab === 'projects' && t.projects.map(({ id, name, tech, blurb, demoNote }, i) => {
+          const Demo = DEMOS[id]
+          return (
+            <div key={id} className="card-shadow">
+              <section className="project" data-index={`SYS_0${i + 1}`}>
+                <div className="project-head">
+                  <h2>{name}</h2>
+                  <div className="btns">
+                    {REPOS[id].map((r) => (
+                      <a key={r.href} className="btn" href={r.href} target="_blank" rel="noreferrer">
+                        {r.label ?? t.source} ↗
+                      </a>
+                    ))}
+                  </div>
+                </div>
+                <p className="tech">{tech.join(' · ')}</p>
+                <p>{blurb}</p>
+                <p className="demo-note">{demoNote}</p>
+                <Demo lang={lang} />
+              </section>
             </div>
-            <p className="tech">{tech.join(' · ')}</p>
-            <p>{blurb}</p>
-            <p className="demo-note">{demoNote}</p>
-            <Demo />
-          </section>
-          </div>
-        ))}
+          )
+        })}
       </main>
 
       <footer>
-        <p>© {new Date().getFullYear()} Martín Salinas Scussolin · built with React + Vite</p>
+        <p>© {new Date().getFullYear()} Martín Salinas Scussolin · {t.footer}</p>
       </footer>
     </>
   )
